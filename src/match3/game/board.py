@@ -4,7 +4,6 @@ from dataclasses import dataclass
 
 import numpy as np
 
-
 EMPTY = -1
 DEFAULT_BOARD_SIZE = (8, 8)
 DEFAULT_CANDY_TYPES = 6

@@ -9,15 +9,23 @@ from .state import GameState, GameStatus
 
 
 class Game:
-    def __init__(self, level: Level):
+    def __init__(
+        self,
+        level: Level,
+        rng: np.random.Generator | None = None,
+    ):
         self.level = level
+        self.rng = rng or np.random.default_rng()
+
         self.state = GameState(
             board=Board.random(
                 size=level.board_size,
                 candy_types=level.candy_types,
+                rng=self.rng,
             ),
             moves_remaining=level.moves,
         )
+        
 
     def check_move(self, move: Move) -> bool:
         """Return True if the move is currently valid."""
@@ -41,7 +49,7 @@ class Game:
 
         self.state.moves_remaining -= 1
 
-        self.resolve_board()
+        self.resolve_board(self.rng)
 
         self.update_status()
 

@@ -16,7 +16,7 @@ Random players as a baseline.
 Heuristic players representing different levels of skill and decision-making.
 Stochastic behaviour to represent variation between players.
 ### Difficulty analysis
-Monte Carlo simulation of thousands of games.
+Monte Carlo simulation of games.
 Win probability, attempts, failure streaks, objective completion and other player-level metrics.
 Analysis of how different level parameters affect difficulty across player segments.
 ### Level balancing and optimisation

@@ -155,7 +155,12 @@ class Board:
             return False
 
         self.swap(first, second)
-        has_match = bool(self.find_matches())
+
+        has_match = (
+            self._cell_has_match(first)
+            or self._cell_has_match(second)
+        )
+
         self.swap(first, second)
 
         return has_match
@@ -192,6 +197,47 @@ class Board:
                 0,
                 self.candy_types,
             )
+
+    def _cell_has_match(self, position: tuple[int, int]) -> bool:
+        """Return True if the candy at a position is part of a match."""
+        row, col = position
+        value = self.grid[row, col]
+
+        if value == EMPTY:
+            return False
+
+        rows, cols = self.grid.shape
+
+        # Horizontal run
+        horizontal_count = 1
+
+        current_col = col - 1
+        while current_col >= 0 and self.grid[row, current_col] == value:
+            horizontal_count += 1
+            current_col -= 1
+
+        current_col = col + 1
+        while current_col < cols and self.grid[row, current_col] == value:
+            horizontal_count += 1
+            current_col += 1
+
+        if horizontal_count >= 3:
+            return True
+
+        # Vertical run
+        vertical_count = 1
+
+        current_row = row - 1
+        while current_row >= 0 and self.grid[current_row, col] == value:
+            vertical_count += 1
+            current_row -= 1
+
+        current_row = row + 1
+        while current_row < rows and self.grid[current_row, col] == value:
+            vertical_count += 1
+            current_row += 1
+
+        return vertical_count >= 3
 
     @staticmethod
     def _are_adjacent(

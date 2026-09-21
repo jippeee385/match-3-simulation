@@ -219,6 +219,26 @@ def test_apply_move_updates_objective_progress():
 
     assert game.state.objective_progress >= 3
 
+def test_apply_move_updates_score():
+    game = make_game()
+    game.state.board = make_valid_board()
+
+    # Swap positions (0,2) and (0,3):
+    #
+    # Before: 0 0 1 0
+    # After:  0 0 0 1
+    #
+    # This creates three 0s, so the score should increase by 3.
+
+    move = Move(
+        first=(0, 2),
+        second=(0, 3),
+    )
+
+    game.apply_move(move)
+
+    assert game.state.score >= 3
+
 def test_game_wins_when_objective_is_completed():
     game = make_game()
 
@@ -256,3 +276,124 @@ def test_game_remains_playing_when_objective_incomplete():
     game.update_status()
 
     assert game.state.status == GameStatus.PLAYING
+
+def test_calculate_score_three_match():
+    level = Level(
+        name="Test Level",
+        moves=10,
+        objective=Objective(
+            type=ObjectiveType.COLLECT,
+            target=3,
+            candy_type=0,
+        ),
+    )
+
+    game = Game(level)
+
+    matches = {
+        (0, 0),
+        (0, 1),
+        (0, 2),
+    }
+
+    assert game.calculate_score(matches) == 3
+
+def test_calculate_score_four_match():
+    level = Level(
+        name="Test Level",
+        moves=10,
+        objective=Objective(
+            type=ObjectiveType.COLLECT,
+            target=3,
+            candy_type=0,
+        ),
+    )
+
+    game = Game(level)
+
+    matches = {
+        (0, 0),
+        (0, 1),
+        (0, 2),
+        (0, 3),
+    }
+
+    assert game.calculate_score(matches) == 4
+
+
+def test_calculate_score_counts_all_matched_cells():
+    level = Level(
+        name="Test Level",
+        moves=10,
+        objective=Objective(
+            type=ObjectiveType.COLLECT,
+            target=3,
+            candy_type=0,
+        ),
+    )
+
+    game = Game(level)
+
+    matches = {
+        (0, 0),
+        (0, 1),
+        (0, 2),
+        (3, 4),
+        (4, 4),
+    }
+
+    assert game.calculate_score(matches) == 5
+
+def test_update_score():
+    level = Level(
+        name="Test Level",
+        moves=10,
+        objective=Objective(
+            type=ObjectiveType.COLLECT,
+            target=3,
+            candy_type=0,
+        ),
+    )
+
+    game = Game(level)
+
+    matches = {
+        (0, 0),
+        (0, 1),
+        (0, 2),
+    }
+
+    game.update_score(matches)
+
+    assert game.state.score == 3
+
+def test_update_score_accumulates():
+    level = Level(
+        name="Test Level",
+        moves=10,
+        objective=Objective(
+            type=ObjectiveType.COLLECT,
+            target=3,
+            candy_type=0,
+        ),
+    )
+
+    game = Game(level)
+
+    first_matches = {
+        (0, 0),
+        (0, 1),
+        (0, 2),
+    }
+
+    second_matches = {
+        (1, 0),
+        (1, 1),
+        (1, 2),
+        (1, 3),
+    }
+
+    game.update_score(first_matches)
+    game.update_score(second_matches)
+
+    assert game.state.score == 7

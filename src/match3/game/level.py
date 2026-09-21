@@ -5,9 +5,9 @@ from enum import Enum
 
 
 class ObjectiveType(Enum):
-    COLLECT = "collect"
-    CLEAR_BLOCKERS = "clear_blockers"
-    SCORE = "score"
+    COLLECT = "collect" # Collect a specific number of candies of a given type.
+    CLEAR_BLOCKERS = "clear_blockers" # Clear all blockers on the board.
+    SCORE = "score" # Achieve a target score within the given number of moves.
 
 
 @dataclass(frozen=True)

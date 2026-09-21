@@ -165,6 +165,51 @@ class Board:
 
         return has_match
 
+    def get_swap_matches(
+        self,
+        first: tuple[int, int],
+        second: tuple[int, int],
+    ) -> set[tuple[int, int]]:
+        """Return the immediate matches created by swapping two adjacent cells."""
+        if not self._are_adjacent(first, second):
+            raise ValueError(
+                "Only horizontally or vertically adjacent cells can swap."
+            )
+
+        # swap the cells
+        self.swap(first, second)
+
+        # find the matches
+        matches = self.find_matches()
+
+        # swap the cells back
+        self.swap(first, second)
+
+        return matches
+
+    def get_swap_match_values(
+        self,
+        first: tuple[int, int],
+        second: tuple[int, int],
+    ) -> list[int]:
+        """Return the candy values in matches created by a swap."""
+        if not self._are_adjacent(first, second):
+            raise ValueError(
+                "Only horizontally or vertically adjacent cells can swap."
+            )
+
+        self.swap(first, second)
+
+        matches = self.find_matches()
+        matched_values = [
+            int(self.grid[row, col])
+            for row, col in matches
+        ]
+
+        self.swap(first, second)
+
+        return matched_values
+
     def remove_matches(self, matches: set[tuple[int, int]]) -> None:
         """Remove matched candies from the board."""
         for row, col in matches:

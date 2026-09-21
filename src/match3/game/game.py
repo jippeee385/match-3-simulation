@@ -53,6 +53,27 @@ class Game:
 
         self.update_status()
 
+    def calculate_score(
+        self,
+        matches: set[tuple[int, int]],
+    ) -> int:
+        """Calculate score gained from matched cells."""
+        return len(matches)
+
+    def calculate_score_from_values(
+        self,
+        values: list[int],
+    ) -> int:
+        """Calculate score from matched candy values."""
+        return len(values)
+
+    def update_score(
+        self,
+        matches: set[tuple[int, int]],
+    ) -> None:
+        """Update the game score based on matched cells."""
+        self.state.score += self.calculate_score(matches)
+
     def resolve_board(
         self,
         rng: np.random.Generator | None = None,
@@ -69,6 +90,8 @@ class Game:
 
             # update the objective progress based on the matches
             self.update_objective_progress(matches)
+            # update the objective progress and score based on the matches
+            self.update_score(matches)
 
             self.state.board.remove_matches(matches)
             self.state.board.apply_gravity()
@@ -76,19 +99,44 @@ class Game:
 
             self.state.cascade_count += 1
 
+    def calculate_objective_progress(
+        self,
+        matches: set[tuple[int, int]],
+    ) -> int:
+        """Calculate objective progress from matched cells."""
+        objective = self.level.objective
+
+        if objective.type == ObjectiveType.COLLECT:
+            return sum(
+                self.state.board.grid[row, col] == objective.candy_type
+                for row, col in matches
+            )
+
+        return 0
+
+    def calculate_objective_progress_from_values(
+        self,
+        values: list[int],
+    ) -> int:
+        """Calculate objective progress from matched candy values."""
+        objective = self.level.objective
+
+        if objective.type == ObjectiveType.COLLECT:
+            return sum(
+                value == objective.candy_type
+                for value in values
+            )
+
+        return 0
+
     def update_objective_progress(
         self,
         matches: set[tuple[int, int]],
     ) -> None:
         """Update objective progress based on matched cells."""
-        objective = self.level.objective
-
-        if objective.type == ObjectiveType.COLLECT:
-            collected = sum(
-                self.state.board.grid[row, col] == objective.candy_type
-                for row, col in matches
-            )
-            self.state.objective_progress += collected
+        self.state.objective_progress += (
+            self.calculate_objective_progress(matches)
+        )
 
     def check_win(self) -> bool:
         """Return True if the level objective has been completed."""

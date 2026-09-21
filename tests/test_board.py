@@ -251,3 +251,22 @@ def test_refill_preserves_existing_candies():
     board.refill(rng)
 
     assert board.grid[0, 1] == original_value
+
+def test_get_swap_matches_does_not_modify_board():
+    board = make_board()
+
+    original = board.grid.copy()
+
+    board.get_swap_matches((0, 0), (0, 1))
+
+    np.testing.assert_array_equal(
+        board.grid,
+        original,
+    )
+
+def test_get_swap_matches_rejects_non_adjacent_cells():
+
+    board = make_board()
+    
+    with pytest.raises(ValueError):
+        board.get_swap_matches((0, 0), (0, 2))
